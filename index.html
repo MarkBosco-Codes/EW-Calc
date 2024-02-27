@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<head>
+
+<title>EW Calculator</title>
+</head>
+
+<body>
+<h1>EW Calculator</h1>
+<i>&copy; Mark Bosco 2024</i><br>
+<b>Note: Check all units</b>
+
+<h4>W to dBm</h4>
+<label for="1">W:</label>
+<input type="text" name="1" id='f1' oninput="$('1').innerText=WtodBm($('f1').value)+' dBm'">
+<p id="1">?</p>
+
+<h4>dBW to dBm</h4>
+<label for="2">dBW:</label>
+<input type="text" name="2" id='f2' oninput="$('2').innerText=dBWtodBm($('f2').value)+' dBm'">
+<p id="2">?</p>
+
+<h4>dBw to W</h4>
+<label for="3">dBW:</label>
+<input type="text" name="3" id='f3' oninput="$('3').innerText=dBwtoW($('f3').value)+' W'">
+<p id="3">?</p>
+
+
+<h4>dBm to mW</h4>
+<label for="4">dBm:</label>
+<input type="text" name="4" id='f4' oninput="$('4').innerText=dBmtomW($('f4').value)+' mW'">
+<p id="4">?</p>
+
+<h4>Wave calculations</h4>
+<label for="5">Hz or m:</label>
+<input type="text" name="5" id='f5' oninput="$('5').innerText=light($('f5').value)+' Hz or m'">
+<p id="5">?</p>
+
+
+<h4>Line-of-Sight spread Loss</h4>
+<label for="6a">Freq (MHz):</label>
+<input type="text" name="6a" id='f6a' oninput="$('6').innerText=losSpread($('f6a').value,$('f6b').value)+' dB'">
+<label for="6b">Dist (km):</label>
+<input type="text" name="6b" id='f6b' oninput="$('6').innerText=losSpread($('f6a').value,$('f6b').value)+' dB'">
+<p id="6">?</p>
+
+
+<h4>Signal Strength</h4>
+<label for="7a">Transmitter Power (W):</label>
+<input type="text" name="7a" id='f7a' oninput="$('7').innerText=signalStrength($('f7a').value,$('f7b').value,$('f7c').value,$('f7d').value,$('f7e').value)+' dB'">
+<br>
+<label for="7b">Transmitter Gain (dB):</label>
+<input type="text" name="7b" id='f7b' oninput="$('7').innerText=signalStrength($('f7a').value,$('f7b').value,$('f7c').value,$('f7d').value,$('f7e').value)+' dB'">
+<br>
+<label for="7c">Receiver Gain (dB):</label>
+<input type="text" name="7c" id='f7c' oninput="$('7').innerText=signalStrength($('f7a').value,$('f7b').value,$('f7c').value,$('f7d').value,$('f7e').value)+' dB'">
+<br>
+<label for="7d">Frequency (MHz):</label>
+<input type="text" name="7d" id='f7d' oninput="$('7').innerText=signalStrength($('f7a').value,$('f7b').value,$('f7c').value,$('f7d').value,$('f7e').value)+' dB'">
+<br>
+<label for="7e">Distance (km):</label>
+<input type="text" name="7e" id='f7e' oninput="$('7').innerText=signalStrength($('f7a').value,$('f7b').value,$('f7c').value,$('f7d').value,$('f7e').value)+' dB'">
+<p id="7"></p>
+<p>General formula for received signal strength:
+    <br>
+    <i>Trans power + tGain + rGain - all attenuation</i>
+</p>
+
+
+<h4>Maximum Effective Distance</h4>
+<label for="8a">Transmitter Power (mW):</label>
+<input type="text" name="8a" id='f8a' oninput="$('8').innerText=maxDistance($('f8a').value,$('f8b').value,$('f8c').value,$('f8d').value,$('f8e').value)+' km'">
+<br>
+<label for="8b">Transmitter Gain (W):</label>
+<input type="text" name="8b" id='f8b' oninput="$('8').innerText=maxDistance($('f8a').value,$('f8b').value,$('f8c').value,$('f8d').value,$('f8e').value)+' km'">
+<br>
+<label for="8c">Receiver Gain (W):</label>
+<input type="text" name="8c" id='f8c' oninput="$('8').innerText=maxDistance($('f8a').value,$('f8b').value,$('f8c').value,$('f8d').value,$('f8e').value)+' km'">
+<br>
+<label for="8d">Frequency (MHz):</label>
+<input type="text" name="8d" id='f8d' oninput="$('8').innerText=maxDistance($('f8a').value,$('f8b').value,$('f8c').value,$('f8d').value,$('f8e').value)+' km'">
+<br>
+<label for="8e">Receiver Power (pW):</label>
+<input type="text" name="8e" id='f8e' oninput="$('8').innerText=maxDistance($('f8a').value,$('f8b').value,$('f8c').value,$('f8d').value,$('f8e').value)+' km'">
+<br>
+
+<p id="8">?</p>
+
+
+
+<script>
+function $(id) { 
+    return document.getElementById( id ); 
+};
+var ranges = [
+  { divider: 1e18 , suffix: 'E' },
+  { divider: 1e15 , suffix: 'P' },
+  { divider: 1e12 , suffix: 'T' },
+  { divider: 1e9 , suffix: 'G' },
+  { divider: 1e6 , suffix: 'M' },
+  { divider: 1e3 , suffix: 'k' }
+];
+
+function formatNumber(n) {
+  for (var i = 0; i < ranges.length; i++) {
+    if (n >= ranges[i].divider) {
+      return (n / ranges[i].divider).toString() + ranges[i].suffix;
+    }
+  }
+  return n.toString();
+}
+
+function WtodBm(W){
+    return 10*Math.log10(W*1000)
+}
+
+function dBWtodBm(dBw){
+    return Number(dBw) + 30
+}
+
+function dBwtoW(dBW){
+    return 10**(dBW/10)
+}
+
+function dBmtomW(dBm){
+    return 10**(dBm/10)
+}
+
+function light(argument){
+    return formatNumber(3*10**(8)/argument)
+}
+
+function losSpread(freq,dist){
+    return 32+20*Math.log10(dist)+20*Math.log10(freq)
+}
+
+
+function signalStrength(tPower, tGain, rGain, freq, dist){
+    attenuation = losSpread(freq, dist);
+    return Number(WtodBm(tPower)) + Number(tGain) + Number(rGain) -attenuation;
+
+}
+
+function maxDistance(tPower,tGain,rGain, freq, rPower){
+    part1 = Number(10*Math.log10(tPower)) + Number(10*Math.log10(tGain)) + Number(10*Math.log10(rGain))  - 20*Math.log10(freq) - 32 + -(10*Math.log10(rPower*10**-9))
+    return 10**(part1/20)
+}
+
+</script>
+</body>
